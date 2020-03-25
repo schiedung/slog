@@ -8,6 +8,9 @@ example_debug: example.cpp slog.h
 example_release: example.cpp slog.h
 	$(CXX) $(CXXFLAGS) -DNLOG_DEBUG example.cpp -Ofast -o example_release
 
+check:
+	./benchmark.sh
+
 clean:
 	rm -f example_debug
 	rm -f example_release
