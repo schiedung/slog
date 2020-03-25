@@ -5,9 +5,11 @@ int main (int argc, char *arc[])
     int A = 321;
     double B  = 124E-2;
     
-    slog::debug << "message\n";
-    slog::debug << "value: " << A << "\n";
-    slog::debug << "value: " << B << "\n";
+    for (size_t i = 0; i < 100000; i++)
+    {
+        slog::debug << "message\n";
+        slog::debug << "value: " << i << "\n";
+    }
 
     slog::info << "message\n";
     slog::info << "value: " << A << "\n";
