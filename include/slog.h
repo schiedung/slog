@@ -24,6 +24,7 @@ namespace slog
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
+/// log level type
 enum class level
 {
     debug    = 0,
@@ -33,29 +34,51 @@ enum class level
     off      = 5
 };
 
-static level log_level = level::debug;
+static level log_level    = level::debug; ///< global log level
+static int   log_sublevel = 0; ///< global log sub-level
 
+///< global log sub-level
 static std::ostream nullstream = std::ostream(nullptr);
 
+/// cout style debug-level info class
 struct debug_type
 {
+    /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
     {
 #ifndef NLOG_DEBUG
-       if (log_level <= level::debug)
+       if (log and log_level <= level::debug)
        {
            return std::cout << "[debug] " << rhs;
        }
+       else log = true;
 #endif
        return nullstream;
     }
-};
-static debug_type debug;
 
+    /// ()operator to set numeric message sub-levels
+    debug_type& operator() (int sublevel)
+    {
+#ifndef LOGSUBLEVEL
+        if(sublevel < log_sublevel)
+        {
+            log = false;
+        };
+#endif
+        return *this;
+    }
+
+  private:
+    bool log = true; ///< true if massage is logged
+
+};
+static debug_type debug; ///< instance of debug message logger
+
+/// cout style info-level info class
 struct info_type
 {
-    friend constexpr std::ostream& operator << (std::ostream&, info_type& rhs);
+    /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
     {
@@ -67,11 +90,29 @@ struct info_type
 #endif
         return nullstream;
     }
+
+    /// ()operator to set numeric message sub-levels
+    info_type& operator() (int sublevel)
+    {
+#ifndef LOGSUBLEVEL
+        if(sublevel < log_sublevel)
+        {
+            log = false;
+        };
+#endif
+        return *this;
+    }
+
+  private:
+    bool log = true; ///< true if massage is logged
+
 };
 static info_type info;
 
+/// cout style warning-level info class
 struct warning_type
 {
+    /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
     {
@@ -83,11 +124,29 @@ struct warning_type
 #endif
         return nullstream;
     }
+
+    /// ()operator to set numeric message sub-levels
+    warning_type& operator() (int sublevel)
+    {
+#ifndef LOGSUBLEVEL
+        if(sublevel < log_sublevel)
+        {
+            log = false;
+        };
+#endif
+        return *this;
+    }
+
+  private:
+    bool log = true; ///< true if massage is logged
+
 };
 static warning_type warn;
 
+/// cout style error-level info class
 struct error_type
 {
+    /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
     {
@@ -99,6 +158,22 @@ struct error_type
 #endif
         return nullstream;
     }
+
+    /// ()operator to set numeric message sub-levels
+    error_type& operator() (int sublevel)
+    {
+#ifndef LOGSUBLEVEL
+        if(sublevel < log_sublevel)
+        {
+            log = false;
+        };
+#endif
+        return *this;
+    }
+
+  private:
+    bool log = true; ///< true if massage is logged
+
 };
 static error_type error;
 }
