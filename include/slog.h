@@ -2,6 +2,7 @@
 #define SLOG_H
 
 #include <iostream>
+#include <limits>
 
 namespace slog
 {
@@ -43,41 +44,57 @@ static std::ostream nullstream = std::ostream(nullptr);
 /// cout style debug-level info class
 struct debug_type
 {
+    debug_type():sublevel(0){}
+
     /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
     {
 #ifndef NLOG_DEBUG
-       if (log and log_level <= level::debug)
+       if (log_level <= level::debug)
        {
-           return std::cout << "[debug] " << rhs;
+           if (sublevel > 0)
+           {
+               return std::cout << "["<< BOLDBLUE << "debug" << RESET  << "] "
+                   << "[" << BOLDBLUE << sublevel << RESET << "] "<<  rhs;
+               sublevel = 0;
+           }
+           else if (sublevel == 0)
+           {
+               return std::cout << "["<< BOLDBLUE << "debug" << RESET  << "] "
+                   << rhs;
+           }
+           else return nullstream;
        }
-       else log = true;
 #endif
        return nullstream;
     }
 
     /// ()operator to set numeric message sub-levels
-    debug_type& operator() (int sublevel)
+    debug_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if(sublevel < log_sublevel)
+        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
         {
-            log = false;
-        };
+            sublevel = inp_sublevel;
+        }
+        else sublevel = -1;
+#elif
+        sublevel = -1;
 #endif
         return *this;
     }
 
   private:
-    bool log = true; ///< true if massage is logged
-
+    int sublevel; ///< temporary sub level storage
 };
 static debug_type debug; ///< instance of debug message logger
 
 /// cout style info-level info class
 struct info_type
 {
+    info_type():sublevel(0){}
+
     /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
@@ -85,33 +102,48 @@ struct info_type
 #ifndef NLOG_INFO
         if (log_level <= level::info)
         {
-            return std::cout << "["<< GREEN << "info" << RESET  << "] " << rhs;
+             if (sublevel > 0)
+             {
+                 return std::cout << "["<< BOLDGREEN << "info" << RESET  << "] "
+                     << "[" << BOLDGREEN << sublevel << RESET << "] "<<  rhs;
+                 sublevel = 0;
+             }
+             else if (sublevel == 0)
+             {
+                 return std::cout << "["<< BOLDGREEN << "info" << RESET  << "] "
+                     << rhs;
+             }
+             else return nullstream;
         }
 #endif
         return nullstream;
     }
 
     /// ()operator to set numeric message sub-levels
-    info_type& operator() (int sublevel)
+    info_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if(sublevel < log_sublevel)
+        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
         {
-            log = false;
-        };
+            sublevel = inp_sublevel;
+        }
+        else sublevel = -1;
+#elif
+        sublevel = -1;
 #endif
         return *this;
     }
 
   private:
-    bool log = true; ///< true if massage is logged
-
+    int sublevel; ///< temporary sub level storage
 };
 static info_type info;
 
 /// cout style warning-level info class
 struct warning_type
 {
+    warning_type():sublevel(0){}
+
     /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
@@ -119,33 +151,48 @@ struct warning_type
 #ifndef NLOG_WARINING
         if (log_level <= level::warning)
         {
-            return std::clog << "["<< BOLDYELLOW << "warning" << RESET  << "] " << rhs;
+            if (sublevel > 0)
+            {
+                return std::clog << "["<< BOLDYELLOW << "warning" << RESET  << "] "
+                    << "[" << BOLDYELLOW << sublevel << RESET << "] "<<  rhs;
+                sublevel = 0;
+            }
+            else if (sublevel == 0)
+            {
+                return std::clog << "["<< BOLDYELLOW << "warning" << RESET  << "] "
+                    << rhs;
+            }
+            else return nullstream;
         }
 #endif
         return nullstream;
     }
 
     /// ()operator to set numeric message sub-levels
-    warning_type& operator() (int sublevel)
+    warning_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if(sublevel < log_sublevel)
+        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
         {
-            log = false;
-        };
+            sublevel = inp_sublevel;
+        }
+        else sublevel = -1;
+#elif
+        sublevel = -1;
 #endif
         return *this;
     }
 
   private:
-    bool log = true; ///< true if massage is logged
-
+    int sublevel; ///< temporary sub level storage
 };
 static warning_type warn;
 
 /// cout style error-level info class
 struct error_type
 {
+    error_type():sublevel(0){}
+
     /// cout style << operator to output messages
     template< class T>
     constexpr std::ostream& operator << (T& rhs)
@@ -153,27 +200,40 @@ struct error_type
 #ifndef NLOG_ERROR
         if (log_level <= level::error)
         {
-            return std::cerr << "["<< BOLDRED << "error" << RESET  << "] " << rhs;
+             if (sublevel > 0)
+             {
+                 return std::cerr << "["<< BOLDRED << "error" << RESET  << "] "
+                     << "[" << BOLDRED << sublevel << RESET << "] "<<  rhs;
+                 sublevel = 0;
+             }
+             else if (sublevel == 0)
+             {
+                 return std::cerr << "["<< BOLDRED << "error" << RESET  << "] "
+                     << rhs;
+             }
+             else return nullstream;
         }
 #endif
         return nullstream;
     }
 
     /// ()operator to set numeric message sub-levels
-    error_type& operator() (int sublevel)
+    error_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if(sublevel < log_sublevel)
+        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
         {
-            log = false;
-        };
+            sublevel = inp_sublevel;
+        }
+        else sublevel = -1;
+#elif
+        sublevel = -1;
 #endif
         return *this;
     }
 
   private:
-    bool log = true; ///< true if massage is logged
-
+    int sublevel; ///< temporary sub level storage
 };
 static error_type error;
 }
