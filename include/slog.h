@@ -35,8 +35,19 @@ enum class level
     off      = 5
 };
 
-static level log_level    = level::debug; ///< global log level
-static int   log_sublevel = 0; ///< global log sub-level
+/// global log level
+inline level& log_level()
+{
+   static level out = level::debug;
+   return out;
+}
+
+/// global log sub-level
+inline int& log_sublevel()
+{
+    static int out = 0;
+    return out;
+}
 
 ///< global log sub-level
 static std::ostream nullstream = std::ostream(nullptr);
@@ -51,7 +62,7 @@ struct debug_type
     constexpr std::ostream& operator << (T& rhs)
     {
 #ifndef NLOG_DEBUG
-       if (log_level <= level::debug)
+       if (log_level() <= level::debug)
        {
            if (sublevel > 0)
            {
@@ -74,7 +85,7 @@ struct debug_type
     debug_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
+        if ((inp_sublevel <= log_sublevel()) and (inp_sublevel >= 0))
         {
             sublevel = inp_sublevel;
         }
@@ -100,7 +111,7 @@ struct info_type
     constexpr std::ostream& operator << (T& rhs)
     {
 #ifndef NLOG_INFO
-        if (log_level <= level::info)
+        if (log_level() <= level::info)
         {
              if (sublevel > 0)
              {
@@ -123,7 +134,7 @@ struct info_type
     info_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
+        if ((inp_sublevel <= log_sublevel()) and (inp_sublevel >= 0))
         {
             sublevel = inp_sublevel;
         }
@@ -149,7 +160,7 @@ struct warning_type
     constexpr std::ostream& operator << (T& rhs)
     {
 #ifndef NLOG_WARINING
-        if (log_level <= level::warning)
+        if (log_level() <= level::warning)
         {
             if (sublevel > 0)
             {
@@ -172,7 +183,7 @@ struct warning_type
     warning_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
+        if ((inp_sublevel <= log_sublevel()) and (inp_sublevel >= 0))
         {
             sublevel = inp_sublevel;
         }
@@ -198,7 +209,7 @@ struct error_type
     constexpr std::ostream& operator << (T& rhs)
     {
 #ifndef NLOG_ERROR
-        if (log_level <= level::error)
+        if (log_level() <= level::error)
         {
              if (sublevel > 0)
              {
@@ -221,7 +232,7 @@ struct error_type
     error_type& operator() (int inp_sublevel)
     {
 #ifndef LOGSUBLEVEL
-        if ((inp_sublevel <= log_sublevel) and (inp_sublevel >= 0))
+        if ((inp_sublevel <= log_sublevel()) and (inp_sublevel >= 0))
         {
             sublevel = inp_sublevel;
         }
